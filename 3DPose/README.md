@@ -1,21 +1,21 @@
 
 ## Introduction
 Current approaches cannot scale to large-scale problems because they rely on one classifier per object, or multi-class classifiers such as Random Forests, whose complexity grows with the number of objects.
-**The only recognition approaches that have been demonstrated to work on large scale problems are based on *Nearest Neighbor (NN)* classification **
+** The only recognition approaches that have been demonstrated to work on large scale problems are based on *Nearest Neighbor (NN)* classification **
 
-While  **feature  point  descriptors  are  used  only  to  find  the points'  identities,  we  here  want  to  find  both  the  object's
-identity and its pose**.
-We therefore seek to **learn a descriptor with the two following properties**:
+While  ** feature  point  descriptors  are  used  only  to  find  the points'  identities,  we  here  want  to  find  both  the  object's
+identity and its pose **.
+We therefore seek to ** learn a descriptor with the two following properties **:
 - The Euclidean distance between descriptors from two different objects should be  large;
 - The  Euclidean  distance  between  descriptors from the same object should be representative of the similarity between their poses.
-This way, given a new object view, we can **recognize the object and get an estimate of its pose by matching its descriptor against a database of registered descriptors.**
+This way, given a new object view, we can ** recognize the object and get an estimate of its pose by matching its descriptor against a database of registered descriptors. **
 
 ## Method
 **CNN is used to identify descriptors which are stored during training in database.
 While testing, the CNN is used to compute descriptors which is compared to the database to find the nearest neighbour**
-#####Working
+##### Working
 For each object in the database,** descriptors are calculated for a set of template views and stored along with the object's identity and 3D pose of the view.** In order to get an estimate for the class and pose of the object depicted in the new input image, we can **compute a descriptor for x** and **search for the most similar descriptors in the database.** The output is then the object and pose associated with them. Therefore, we introduce a method to efficiently map an input image to a compact and discriminative descriptor that can be used in the nearest neighbor search according to the Euclidean distance.
-#####Training the CNN
+##### Training the CNN
 *S~train~ training samples*
 Each sample = (x,c,p)
 - **x**, **image** of an object, (color or grayscale)
@@ -47,7 +47,7 @@ Consider a pair (s~i~,s~j~) of samples from the **same object** under **very sim
 This term therefore **enforces the fact that for two images of the same object and same pose, we want to obtain two descriptors which are as close as possible to each other**, even if they are from different imaging conditions:
 ![](/home/b/Pictures/pairsmin.png)
 
-##Implementation
+## Implementation
 
 * two **convolutional layers** with a set of filters,max-pooling and sub-sampling over a 2x2 area and a rectified  linear  (ReLU)  activation  function
 * two **fully connected layers**.
@@ -67,7 +67,7 @@ To assemble a mini-batch
 	* Dissimilar sample is either another, less similar template from the same object or any template of a different object.
 * **Pairs are then formed by associating each training sample with its closest template**
 
-##Dataset Compilation
+## Dataset Compilation
 We train a CNN using our method on a mixture of ***synthetic*** and ***real world data***.  We create synthetic training data by **rendering the mesh available for each of the objects in the dataset from positions on a half-dome over the object**.
 Viewpoints are defined by *starting with a regular icosahedron* and *recursively subdividing each triangle into 4 sub-triangles*.
 Hence, totally - 1241 positions.
@@ -82,6 +82,6 @@ x
 On both RGB and depth channel we add a small amount of Gaussian noise.
 On the synthetic images, we add larger fractal noise on the background, **to simulate diverse backgrounds**
 
-######Normalisation
+###### Normalisation
 * RGB images - normalized to the usual zero mean, unit variance.
 * Depth maps - subtract the depth at the center of the object, scale down such that 20 cm in front and back map to -1 to +1

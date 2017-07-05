@@ -86,7 +86,7 @@ def create_scene():
              bpy.ops.object.origin_set(type="ORIGIN_GEOMETRY")
              obj.location = (0,0,0)
              max_dimension = obj.dimensions.length * 2
-             bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2,size=max_dimension,location=(0,0,0),layers=((False,)+(True,)+(False,)*18))
+             bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=5,size=max_dimension,location=(0,0,0),layers=((False,)+(True,)+(False,)*18))
              ico = bpy.data.objects['Icosphere']
              vertices = ico.data.vertices
              world_matrix = obj.matrix_world.to_translation()

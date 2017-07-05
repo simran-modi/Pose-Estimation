@@ -1,13 +1,14 @@
 
 # Run using  blender : --background --python blender.py
+
 import glob
 import os
 import numpy as np
 import json
 import bpy
 from mathutils import Matrix
-#directory_path = "/home/b/gitpository/Pose-Estimation/3DPose"
-directory_path = ""
+
+directory_path = "C:/Users/METARVRSE/Desktop/Pose-Estimation/3DPose"
 os.chdir(os.path.join(directory_path,"obj_models"))
 folders = os.listdir(".")
 cam = bpy.data.objects['Camera']
@@ -61,7 +62,7 @@ def render_images(vertices,ID,world_matrix):
         lamp.location = (v.co.x,v.co.y,v.co.z)
         look_at(world_matrix)
         RT = get_3x4_RT_matrix_from_blender(cam)
-        bpy.data.scenes["Scene"].render.filepath = os.path.join('images',str(ID),str(num))
+        bpy.data.scenes["Scene"].render.filepath = os.path.join(directory_path,'images',str(ID),str(num)+'.jpg')
         bpy.ops.render.render(write_still=True )
         num = num + 1
     object_poses.append(pose)
@@ -85,7 +86,7 @@ def create_scene():
              bpy.ops.object.origin_set(type="ORIGIN_GEOMETRY")
              obj.location = (0,0,0)
              max_dimension = obj.dimensions.length * 2
-             bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=4,size=max_dimension,location=(0,0,0),layers=((False,)+(True,)+(False,)*18))
+             bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2,size=max_dimension,location=(0,0,0),layers=((False,)+(True,)+(False,)*18))
              ico = bpy.data.objects['Icosphere']
              vertices = ico.data.vertices
              world_matrix = obj.matrix_world.to_translation()

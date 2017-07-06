@@ -9,8 +9,8 @@ import bpy
 from mathutils import Matrix,Vector
 
 # Set directory path here
-#directory_path = "C:/Users/METARVRSE/Desktop/Pose-Estimation/3DPose"
-directory_path = "/home/b/gitpository/Pose-Estimation/3DPose"
+directory_path = "C:/Users/METARVRSE/Desktop/Pose-Estimation/3DPose"
+#directory_path = "/home/b/gitpository/Pose-Estimation/3DPose"
 os.chdir(os.path.join(directory_path,"obj_models"))
 
 # Fetch all files and folder in obj_models
@@ -42,14 +42,14 @@ pose = []
 object_poses = []
 
 def look_at(point):
-    '''
-    Points the camera (cam) at point
-    Note:
-        Lamp moves along with the camera across the icosphere and point in the same direction as camera
-        This is done to focus on features present in the current pose by shedding light in the same direction
-    Args :
-        point : Vector, to point the camera at
-    '''
+     '''
+     Points the camera (cam) at point
+     Note:
+         Lamp moves along with the camera across the icosphere and point in the same direction as camera
+         This is done to focus on features present in the current pose by shedding light in the same direction
+     Args :
+         point : Vector, to point the camera at
+     '''
      global cam,lamp
      #  Fetch location of camera
      loc_camera = cam.location
@@ -121,34 +121,36 @@ def render_images(vertices,ID,world_matrix):
         RT = get_3x4_RT_matrix_from_blender(cam)
         pose.append(RT)
         # Set filename of image and then render
-        bpy.data.scenes["Scene"].render.filepath = os.path.join(directory_path,'images',str(ID),str(num)+'.jpg')
-        bpy.ops.render.render(write_still=True )
-        num = num + 1
+        #bpy.data.scenes["Scene"].render.filepath = os.path.join(directory_path,'images',str(ID),str(num)+'.jpg')
+        #bpy.ops.render.render(write_still=True )
+        #num = num + 1
     object_poses.append(pose)
 
 def create_scene():
-    """
-    Iterates over all folders in the current path, checking for obj models.
-    Creates an icosphere to
-    Args: None
-    Variables :
-        folder :    Each file/folder in the directory (Each object)
-        models :    List of all obj models in given folder
-        obj :       Each object when loaded in blender
-        max_dimension: Twice the diagonal length of object's bounding box
-                    This is set as the radius of the icosphere
-        ico:        Icosphere
-
-    """
+     """
+     Iterates over all folders in the current path, checking for obj models.
+     Creates an icosphere to
+     Args: None
+     Variables :
+         folder :    Each file/folder in the directory (Each object)
+         models :    List of all obj models in given folder
+         obj :       Each object when loaded in blender
+         max_dimension: Twice the diagonal length of object's bounding box
+                     This is set as the radius of the icosphere
+         ico:        Icosphere
+ 
+     """
      global folders
      for folder in folders:
+         print(os.getcwd())
          if not os.path.isdir(folder):
              print (folder)
+             print("folders")
              continue
          # Changing directory to object folder if it is a directory
          os.chdir(folder)
-         models = [x for x in os.listdir(".") if x.endswith(".obj")]
-         print (models)
+         models = glob.glob("*.obj")
+         print (len(models))
          for model in models:
              obj_name = model[0:-4]
              bpy.ops.import_scene.obj(filepath=model)
@@ -162,7 +164,7 @@ def create_scene():
              ico = bpy.data.objects['Icosphere']
              vertices = ico.data.vertices
              #world_matrix = obj.matrix_world.to_translation()
-             world_matrix = (0,0,0)
+             world_matrix = Vector((0,0,0))
              render_images(vertices,obj_name,world_matrix)
              #delete the objects
              objs = bpy.data.objects
@@ -175,3 +177,4 @@ create_scene()
 with open(os.path.join(directory_path,'pose.json'), 'w') as outfile:
     print (outfile)
     json.dump(object_poses, outfile)
+

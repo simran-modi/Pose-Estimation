@@ -13,8 +13,8 @@ from keras import backend as K
 import re
 
 # I
-img_width = 300
-img_height = 300
+img_width = 64
+img_height = 64
 
 # Set directory path here
 directory_path = "."
@@ -31,27 +31,32 @@ Y = None
 
 # 
 def objectpathtoX(obpath):
-    X = np.array
+    X = None
     # image_path = "images"
     images_list = glob.glob(os.path.join(obpath,"*.png"))
     images_list.sort(key= lambda x:int(re.findall("(\d*)\.png",x)[0]))
     #reading all images as numpy arrays
     for image in images_list:
         X_image = cv2.imread(image)
-        X = np.vstack(X, X_image)
+	if X is None:
+		X = [X_image]
+	else:
+		X = np.vstack((X, [X_image]))
     return X
 
 def fetchX():
     os.chdir(os.path.join(directory_path,"images"))
     folders = os.listdir(".")
-    finX = np.array
+    finX = None
     for f in folders:
         if not os.path.isdir(f):
             print (folder)
             continue
         Xarr = objectpathtoX(f)
-        print(Xarr)
-        finX = np.vstack(finX,Xarr)
+	if finX is None:
+	    finX = Xarr
+	else:
+	    finX = np.vstack((finX, [Xarr]))
     return finX
 
 #loading y labels and creating train-test split: json_file = file path of labels
@@ -59,12 +64,16 @@ def fetchY():
     Y = None
     with open('pose.json') as labels:
         Y = np.array(json.load(labels))
-        Y.reshape(Y.shape[0],Y.shape[1],1,12)
+        Y = Y.reshape(2562,-1)
     if Y is not None:
         return Y
     else:
         print ("Y is None")
 
+X = fetchX()
+Y = fetchY()
+print("X shape: ", X.shape)
+print("Y shape: ", Y.shape)
 
 x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size = 0.30)
 
@@ -81,7 +90,7 @@ sgd = keras.optimizers.SGD(lr = 0.01, decay = 1e-6, momentum = 0.9, nesterov = T
 
 model.compile(loss = losses.mean_squared_error, optimizer = 'sgd', metrics = ['accuracy'])
 
-model.fit(x_train, y_train, batch_size = batch_size, epochs = epochs)
+model.fit(x_train, y_train, batch_size = batch_size, epochs = epochs, verbose = 2)
 
 predictions = model.predict(x_test, batch_size = batch_size)
-print predictions
+print(predictions)

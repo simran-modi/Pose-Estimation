@@ -8,28 +8,55 @@ import json
 import bpy
 from mathutils import Matrix
 
+# Set directory path here
 directory_path = "C:/Users/METARVRSE/Desktop/Pose-Estimation/3DPose"
 os.chdir(os.path.join(directory_path,"obj_models"))
+
+# Fetch all files and folder in obj_models
 folders = os.listdir(".")
+
+# cam - loads current camera as an object
+# So cam can be moved and rotated
 cam = bpy.data.objects['Camera']
+
+# c - loads current "Camera" as a camera
+# SO c can access lens properties
 c = bpy.data.cameras['Camera']
+
+# Increases clipend of c so it can render larger objects
 c.clip_end = 4500
+
+# Setting lamp (light) type to SUN
+# SUN is unidirectional and at infinite distance.
+# Hence only direction of SUN wrt origin matters. Not distance
 lamp = bpy.data.objects['Lamp']
 lamp.data.type = "SUN"
+
+# Setting render image size to (64,64)
 bpy.data.scenes['Scene'].render.resolution_x = 64
 bpy.data.scenes['Scene'].render.resolution_y = 64
+
 pose = []
 object_poses = []
 
+# look_at point the camera (cam) at point
+# Note:
+# Lamp moves along with the camera across the icosphere and point in the same direction as camera
+# This is done to focus on features present in the current pose by shedding light in the same direction
 def look_at(point):
      global cam,lamp
+     #  Fetch location of camera
      loc_camera = cam.location
+     # Get directional vector
      direction = point - loc_camera
      # point the cameras '-Z' and use its 'Y' as up
      rot_quat = direction.to_track_quat('-Z', 'Y')
+     # Rotate the camera and then the lamp
      cam.rotation_euler = rot_quat.to_euler()
      lamp.rotation_euler = rot_quat.to_euler()
 
+# Appends pose (as an RT matrix) of cam to global list - pose
+# RT Matrix explanation : https://www.youtube.com/watch?v=WkGSYJm2_kk&index=227&list=PLAwxTw4SYaPnbDacyrK_kB_RUkuxQBlCm
 def get_3x4_RT_matrix_from_blender(cam):
     global pose
     # bcam stands for blender camera
@@ -52,6 +79,7 @@ def get_3x4_RT_matrix_from_blender(cam):
     # put into 3x4 matrix
     RT = np.append(R_world2cv,T_world2cv,axis=1)
     pose.append(RT.tolist())
+
 
 def render_images(vertices,ID,world_matrix):
     global cam, lamp, pose, object_poses

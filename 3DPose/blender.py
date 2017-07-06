@@ -69,7 +69,7 @@ def get_3x4_RT_matrix_from_blender(cam):
     Args:
         cam : Camera, whose RT matrix needs to be returned
     Variables :
-        R_bcam2cv : Matrix representing blender's perspective of the world
+        R_bcam2cv : Matrix representing blender's camera perspective of the world
 
     """
     # bcam stands for blender camera

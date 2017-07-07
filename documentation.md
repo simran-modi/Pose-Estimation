@@ -1,9 +1,10 @@
 DOCUMENTATION
 
-GOAL: To estimate the 3D pose of an object in real time.
+GOAL: To estimate the 6D pose of an object in real time.
 
-To identify the 3D pose of an object it is sufficient to find the projection matrix that maps the transformation from
-3D Euclidean space to 2D image. It is also known as the extrinsic camera parameters.
+To identify the 6D pose(3 Rotational and 3 translational degrees of freedom) of an object it is sufficient to find
+the projection matrix that maps the transformation from 3D Euclidean space to 2D image. It is also known as the
+extrinsic camera parameters.
 
 													Xc = R(Xw) + T
 				
@@ -14,7 +15,7 @@ To identify the 3D pose of an object it is sufficient to find the projection mat
 
 Concatenating the R and T i.e. [R|T] results in a 3x4 projection matrix.
 
-APPROACH 1:
+APPROACH 1: 
 	
 	The initial approach follows from link: http://docs.opencv.org/trunk/dc/d2c/tutorial_real_time_pose.html
 	
@@ -46,8 +47,21 @@ APPROACH 1:
 		1. Implement Kalman filter for smoother pose detection
 		2. Map features detected during registration to the face it was detected in. Repeat for all faces to 
 			address unseen face issue.
-		
-		
+
+APPROACH 2: IKEA dataset
 			
+APPROACH 3: CNN approach
+	http://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Wohlhart_Learning_Descriptors_for_2015_CVPR_paper.pdf
+	http://docs.opencv.org/trunk/d2/d42/tutorial_table_of_content_cnn_3dobj.html
+	
+		
+		
+REFERENCES:
+	1. 6D pose estimation papers: http://www.iis.ee.ic.ac.uk/rkouskou/research/6D_Object.html
+	2. AR publications: https://handheldar.icg.tugraz.at/publications.php
+	3. More papers and datasets: http://far.in.tum.de/Main/StefanHinterstoisser
+	4. Udacity Computer Vision course: https://www.youtube.com/playlist?list=PLAwxTw4SYaPnbDacyrK_kB_RUkuxQBlCm
+	5. Udacity Computational Photography course: https://www.youtube.com/playlist?list=PLAwxTw4SYaPn-unAWtRMleY4peSe4OzIY
+	6. OpenCV Python tutorial: http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_tutorials.html		
 	
 									

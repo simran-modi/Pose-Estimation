@@ -2,17 +2,16 @@ import json
 import numpy as np
 import cv2,os
 import glob
-import keras
 from keras import losses
+from keras import optimizers
 from keras.models import Sequential
 from keras.layers import Dense, Conv2D, MaxPooling2D
 from keras.layers import Flatten, Dropout
 from sklearn.model_selection import train_test_split
-#from keras.preprocessing.image import ImageDataGenerator, img_to_array, load_img
 from keras import backend as K
 import re
 
-# I
+# Setting image size
 img_width = 64
 img_height = 64
 
@@ -29,7 +28,7 @@ batch_size = 32
 epochs = 50
 Y = None
 
-# 
+#
 def objectpathtoX(obpath):
     X = None
     # image_path = "images"
@@ -38,31 +37,37 @@ def objectpathtoX(obpath):
     #reading all images as numpy arrays
     for image in images_list:
         X_image = cv2.imread(image)
-	if X is None:
-		X = [X_image]
-	else:
-		X = np.vstack((X, [X_image]))
+        if X is None:
+            X = X_image.reshape(1,64,64,3)
+        else:
+            X = np.vstack((X, [X_image]))
     return X
 
 def fetchX():
     os.chdir(os.path.join(directory_path,"images"))
     folders = os.listdir(".")
-    finX = None
+    #Uncomment for multiple objects
+    #finX = None
+    #Comment Xarr declaration for multiple objects (optional)
+    Xarr = None
     for f in folders:
         if not os.path.isdir(f):
-            print (folder)
+            print (f)
             continue
         Xarr = objectpathtoX(f)
-	if finX is None:
-	    finX = Xarr
-	else:
-	    finX = np.vstack((finX, [Xarr]))
-    return finX
+        print(Xarr.shape)
+    #Uncomment the following lines for pose estimation for multiple objects
+#	if finX is None:
+#	    finX = Xarr.reshape(1,64,64,3)
+#	else:
+#	    finX = np.vstack((finX, Xarr))
+    #return finX
+    return Xarr
 
 #loading y labels and creating train-test split: json_file = file path of labels
 def fetchY():
     Y = None
-    with open('pose.json') as labels:
+    with open(os.path.join(directory_path,'pose.json')) as labels:
         Y = np.array(json.load(labels))
         Y = Y.reshape(2562,-1)
     if Y is not None:
@@ -86,7 +91,7 @@ model.add(Flatten())
 model.add(Dense(256, activation = 'relu'))
 model.add(Dropout(0.5))
 model.add(Dense(12))
-sgd = keras.optimizers.SGD(lr = 0.01, decay = 1e-6, momentum = 0.9, nesterov = True)
+sgd = optimizers.SGD(lr = 0.01, decay = 1e-6, momentum = 0.9, nesterov = True)
 
 model.compile(loss = losses.mean_squared_error, optimizer = 'sgd', metrics = ['accuracy'])
 
